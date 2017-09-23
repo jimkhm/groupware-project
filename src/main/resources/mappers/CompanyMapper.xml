@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- http://www.mybatis.org/mybatis-3/ko/configuration.html [매퍼 설정]>[Handling Enums] 에서 복사해 오기 -->
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="spring.mybatis.gw.admin.dto.CompanyDTO">
+	<resultMap type="Company" id="companyResultMap">
+		<result column="comp_cd" property="comp_cd"/><!-- 회사 코드 -->
+		<result column="comp_nm" property="comp_nm"/><!-- 회사명 -->
+		<result column="comp_no1" property="comp_no1"/><!-- 사업자 등록 번호 -->
+		<result column="comp_no2" property="comp_no2"/><!-- 법인 등록 번호 -->
+		<result column="comp_ceo_nm" property="comp_ceo_nm"/><!-- 대표자(성명) -->
+		<result column="comp_addr" property="comp_addr"/><!-- 소재지(회사 주소) -->
+		<result column="comp_phone" property="comp_phone"/><!-- 회사 대표 전화 -->
+		<result column="admin_id" property="admin_id"/><!-- 관리자 아이디 -->
+		<result column="admin_phone" property="admin_phone"/><!-- 관리자 연락처 -->
+		<result column="admin_pw" property="admin_pw"/><!-- 관리자 비밀번호 -->
+		<result column="insert_id" property="insert_id"/><!-- insert user -->
+		<result column="insert_dt" property="insert_dt"/><!-- insert time -->
+		<result column="update_id" property="update_id"/><!-- 최종 update user -->
+		<result column="update_dt" property="update_dt"/><!-- 최종 update time -->
+	</resultMap>
+
+	<insert id="insertCompany" parameterType="Company">
+	   insert into company_info ( 
+			COMP_CD, COMP_NM, COMP_NO1, COMP_NO2,
+			COMP_CEO_NM, COMP_ADDR, COMP_PHONE,
+			ADMIN_ID, ADMIN_PHONE, ADMIN_PW,
+			INSERT_ID, INSERT_DT, UPDATE_ID, UPDATE_DT ) 
+		values ( 
+			#{comp_cd}, #{comp_nm}, #{comp_no1, jdbcType=VARCHAR}, #{comp_no2, jdbcType=VARCHAR},
+			#{comp_ceo_nm, jdbcType=VARCHAR}, #{comp_addr, jdbcType=VARCHAR}, #{comp_phone, jdbcType=VARCHAR}, 
+			#{admin_id}, #{admin_phone, jdbcType=VARCHAR}, #{admin_pw}, 
+			#{insert_id, jdbcType=VARCHAR}, SYSDATE, NULL, NULL )
+	</insert>
+	
+	<update id="updateCompany" parameterType="Company">
+		update company_info set 
+			comp_nm = #{comp_nm}, comp_no1 = #{comp_no1, jdbcType=VARCHAR}, comp_no2 = #{comp_no2, jdbcType=VARCHAR},
+			comp_ceo_nm = #{comp_ceo_nm, jdbcType=VARCHAR}, comp_addr = #{comp_addr, jdbcType=VARCHAR}, comp_phone = #{comp_phone, jdbcType=VARCHAR},
+			admin_id = #{admin_id}, admin_phone = #{admin_phone, jdbcType=VARCHAR},
+			update_id = #{update_id, jdbcType=VARCHAR}, update_dt = SYSDATE		
+		where comp_cd = #{comp_cd}
+	</update>
+	
+	<update id="updateCompanyWithPW" parameterType="Company">
+		update company_info set 
+			comp_nm = #{comp_nm}, comp_no1 = #{comp_no1, jdbcType=VARCHAR}, comp_no2 = #{comp_no2, jdbcType=VARCHAR},
+			comp_ceo_nm = #{comp_ceo_nm, jdbcType=VARCHAR}, comp_addr = #{comp_addr, jdbcType=VARCHAR}, comp_phone = #{comp_phone, jdbcType=VARCHAR},
+			admin_id = #{admin_id}, admin_phone = #{admin_phone, jdbcType=VARCHAR}, admin_pw = #{admin_pw},
+			update_id = #{update_id, jdbcType=VARCHAR}, update_dt = SYSDATE		
+		where comp_cd = #{comp_cd}
+	</update>
+
+	<delete id="deleteCompany" parameterType="String">
+		delete from company_info where comp_cd = #{comp_cd}
+	</delete>
+	
+	<select id="selectCountId" parameterType="Company" resultType="Integer">
+		select count(*) cnt from ( 
+			select emp_id id 
+			from employee_info e 
+			where e.comp_cd = #{comp_cd} and e.emp_id = #{admin_id} 
+			union all 
+			select admin_id id 
+			from company_info c 
+			where c.comp_cd = #{comp_cd} and c.admin_id = #{admin_id} 
+			)
+	</select>
+
+	<select id="selectCompany" resultType="Company">
+		select * from company_info where comp_cd = #{comp_cd} 
+	</select>
+
+	<select id="selectAllCompany" resultType="Company">
+		select * from company_info order by comp_cd 
+	</select>
+	
+	<select id="selectAdminPw" resultType="String" parameterType="Company">
+		select ADMIN_PW from company_info
+		where comp_cd = #{comp_cd} and admin_id = #{admin_id} 
+	</select>
+	
+	<!-- 로그인 화면 관리자 체크-->			
+	<select id="selectAdminChk" parameterType="Company" resultType="String">			
+		select admin_pw from company_info		
+		where comp_cd=#{comp_cd} and admin_id=#{admin_id}		
+	</select>			
+			
+	<!-- 관리자 기존 비밀번호 체크 -->			
+	<select id = "selectAdminPwChk" parameterType="Company" resultType="Company">			
+		select * from company_info		
+		where comp_cd=#{comp_cd} and admin_id=#{admin_id}		
+	</select>			
+
+</mapper>

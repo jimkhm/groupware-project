@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="spring.mybatis.gw.apprdoc.dao.Apprrrr">
+
+	<select id="getApprYN" parameterType="int" resultType="Integer">
+		select count(*) from
+		(select status from appr_history where appr_no = #{param1})
+		where status = '반려' or status='거부'
+	</select>
+
+	<select id="getApprHistoryMax" parameterType="int" resultType="Integer">
+		select max(priority ) from appr_history where appr_no = #{param1}
+	</select>
+
+	<select id="getMyApprHistory" parameterType="spring.mybatis.gw.apprdoc.dto.ApprListDTO"
+		resultType="Integer">
+		select count(*) from appr_history where emp_no = #{emp_no} and comp_cd=
+		#{comp_cd} and appr_no=#{appr_no}
+	</select>
+
+	<select id="getMyHistoryStatus" parameterType="spring.mybatis.gw.apprdoc.dto.ApprListDTO"
+		resultType="String">
+		select status from appr_history where emp_no = #{emp_no} and comp_cd =
+		#{comp_cd} and appr_no= #{appr_no}
+	</select>
+		
+	<select id="getHistory" parameterType="spring.mybatis.gw.apprdoc.dto.ApprListDTO" resultType="HistoryPopDTO">
+			select s.APPR_LINE_NO APPR_LINE_NO, s.APPR_NO APPR_NO, s.APPR_LINE APPR_LINE, s.EMP_NO EMP_NO, s.APPR_PRIORITY APPR_PRIORITY, s.EMP_NO EMP_NO, s.INSERT_DT INSERT_DT,  
+				e.DEPT_NO DEPT_NO, e.EMP_ROLE_CD EMP_ROLE_CD, e.EMP_NM EMP_NM, e.EMP_ID EMP_ID, 
+				F_GET_DEPT_NAME(s.comp_cd, DEPT_NO) dept_nm, F_GET_CD_NM(s.comp_cd,'ROLE',EMP_ROLE_CD) role 
+				from APPR_STEP s, EMPLOYEE_INFO e where s.EMP_NO = e.EMP_NO and (s.APPR_LINE= 'A' or s.APPR_LINE= 'B') 
+				and s.COMP_CD = #{comp_cd} and s.appr_no = #{appr_no} order by s.APPR_LINE desc, s.APPR_PRIORITY
+	</select>
+	
+	
+	
+	<insert id="apprHistoryInsert" parameterType="ApprHistoryDTO">
+			insert into appr_history (
+			comp_cd, history_id, appr_line_no, appr_no, emp_no, 
+			insert_id, insert_dt, status, priority) 
+			values(
+				#{comp_cd},APPR_HISTORY_SEQ.nextval,
+				#{appr_line_no}, #{appr_no},#{emp_no, jdbcType=VARCHAR},
+				#{insert_id}, SYSDATE, F_GET_CD_NM(#{comp_cd}, 'STATUS', #{status}),#{priority})
+	</insert>
+
+</mapper>

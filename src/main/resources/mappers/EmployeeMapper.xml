@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- http://www.mybatis.org/mybatis-3/ko/configuration.html [매퍼 설정]>[Handling Enums] 에서 복사해 오기 -->
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="spring.mybatis.gw.admin.dto.EmployeeDTO">
+	<resultMap type="Employee" id="employeeResultMap">
+		<result column="comp_cd" property="comp_cd"/><!-- 회사 코드 -->
+		<result column="emp_no" property="emp_no"/><!-- 사번 -->
+		<result column="emp_id" property="emp_id"/><!-- 아이디 -->
+		<result column="emp_pw" property="emp_pw"/><!-- 비밀번호 -->
+		<result column="emp_nm" property="emp_nm"/><!-- 이름 -->
+		<result column="dept_no" property="dept_no"/><!-- 부서코드 -->
+		<result column="emp_role_cd" property="emp_role_cd"/><!-- 직급코드 -->
+		<result column="emp_phone" property="emp_phone"/><!-- 전화번호 -->
+		<result column="emp_email" property="emp_email"/><!-- 이메일 -->
+		<result column="emp_addr" property="emp_addr"/><!-- 주소 -->
+		<result column="insert_id" property="insert_id"/><!-- insert user -->
+		<result column="insert_dt" property="insert_dt"/><!-- insert time -->
+		<result column="update_id" property="update_id"/><!-- 최종 update user -->
+		<result column="update_dt" property="update_dt"/><!-- 최종 update time -->
+		<result column="dept_nm" property="dept_nm"/><!-- 부서명** -->
+		<result column="emp_role_nm" property="emp_role_nm"/><!-- 직급명** -->
+		<result column="check_yn" property="check_yn"/><!-- 삭제여부** -->
+		<result column="search_input" property="search_input"/><!-- 검색어** -->
+		<result column="img_file_nm" property="img_file_nm"/><!-- 이미지 파일명 -->
+		<result column="img_file_rnm" property="img_file_rnm"/><!-- 실제 이미지 파일명 -->
+	</resultMap>
+
+	<insert id="insertEmployee" parameterType="Employee">
+		insert into employee_info ( COMP_CD, EMP_NO, EMP_ID, EMP_PW, EMP_NM, 
+			DEPT_NO, EMP_ROLE_CD, EMP_PHONE, EMP_EMAIL, EMP_ADDR, 
+			INSERT_ID, INSERT_DT, UPDATE_ID, UPDATE_DT ) values ( 
+			#{comp_cd}, #{emp_no}, #{emp_id}, #{emp_pw}, #{emp_nm}, 
+			#{dept_no, jdbcType=VARCHAR}, #{emp_role_cd, jdbcType=VARCHAR}, 
+			#{emp_phone, jdbcType=VARCHAR}, #{emp_email, jdbcType=VARCHAR}, #{emp_addr, jdbcType=VARCHAR}, 
+			#{insert_id, jdbcType=VARCHAR}, SYSDATE, null, null )
+	</insert>
+	
+	<update id="updateEmployee" parameterType="Employee">
+		update employee_info set 
+				emp_id = #{emp_id}, emp_nm = #{emp_nm},
+				dept_no = #{dept_no, jdbcType=VARCHAR}, emp_role_cd = #{emp_role_cd, jdbcType=VARCHAR},
+				emp_phone = #{emp_phone, jdbcType=VARCHAR}, emp_email = #{emp_email, jdbcType=VARCHAR}, emp_addr = #{emp_addr, jdbcType=VARCHAR}, 
+				update_id = #{update_id, jdbcType=VARCHAR}, update_dt = SYSDATE 
+		where comp_cd = #{comp_cd} and emp_no = #{emp_no} 
+	</update>
+	
+	<update id="updateEmployeeWithPW" parameterType="Employee">
+		update employee_info set 
+				emp_id = #{emp_id}, emp_nm = #{emp_nm},
+				dept_no = #{dept_no, jdbcType=VARCHAR}, emp_role_cd = #{emp_role_cd, jdbcType=VARCHAR},
+				emp_phone = #{emp_phone, jdbcType=VARCHAR}, emp_email = #{emp_email, jdbcType=VARCHAR}, emp_addr = #{emp_addr, jdbcType=VARCHAR}, 
+				update_id = #{update_id, jdbcType=VARCHAR}, update_dt = SYSDATE, 
+				emp_pw = #{emp_pw}
+		where comp_cd = #{comp_cd} and emp_no = #{emp_no} 
+	</update>
+
+	<delete id="deleteEmployee" parameterType="Employee">
+		delete from employee_info where comp_cd = #{comp_cd} and emp_no = #{emp_no} 
+	</delete>
+
+	<!-- 사번 체크 -->
+	<select id="selectCountEmpNo" parameterType="Employee" resultType="Integer">
+		select count(*) from employee_info where comp_cd = #{comp_cd} and emp_no = #{emp_no} 
+	</select>
+	
+	<!-- ID 체크 -->
+	<select id="selectCountEmpId" parameterType="Employee" resultType="Integer">
+		select count(*) cnt from ( select emp_id id from employee_info e where e.comp_cd = #{comp_cd} and e.emp_id = #{emp_id} 
+		union all select admin_id id from company_info c where c.comp_cd = #{comp_cd} and c.admin_id = #{emp_id} )  
+	</select>
+	
+	<!-- 사원 정보 테이블에 사원 수 return -->
+	<select id="selectCountEmployee" parameterType="String" resultType="Integer">
+		select count(*) from employee_info where comp_cd = #{comp_cd} 
+	</select>
+	
+	<!-- 로그인 화면에서 사용함!! -->
+	<select id="selectEmployeeInfo" parameterType="Employee" resultType="Employee">
+		select emp_no, emp_nm, dept_no, f_get_dept_name(comp_cd, dept_no) dept_nm from employee_info where comp_cd = #{comp_cd} and emp_id = #{emp_id} 
+	</select>
+	
+	<select id="selectAllEmployee" parameterType="String" resultType="Employee">
+		select COMP_CD, EMP_NO, EMP_ID, EMP_PW, EMP_NM, DEPT_NO, EMP_ROLE_CD, 
+		EMP_PHONE, EMP_EMAIL, EMP_ADDR, INSERT_ID, INSERT_DT, UPDATE_ID, UPDATE_DT, 
+		F_GET_DEPT_NAME(COMP_CD, DEPT_NO) dept_nm, F_GET_CD_NM( COMP_CD, 'ROLE', EMP_ROLE_CD) emp_role_nm, 
+		'N' check_yn from employee_info where comp_cd = #{comp_cd} 
+		order by emp_no 
+	</select>
+	
+	<select id="selectEmployeeSearchEmpName" parameterType="Employee" resultType="Employee">
+		select * from (select COMP_CD, EMP_NO, EMP_ID, EMP_PW, EMP_NM, DEPT_NO, EMP_ROLE_CD, 
+		EMP_PHONE, EMP_EMAIL, EMP_ADDR, INSERT_ID, INSERT_DT, UPDATE_ID, UPDATE_DT, 
+		F_GET_DEPT_NAME(COMP_CD, DEPT_NO) dept_nm, F_GET_CD_NM( COMP_CD, 'ROLE', EMP_ROLE_CD) emp_role_nm, 
+		'N' check_yn from employee_info where comp_cd = #{comp_cd} )
+		where EMP_NM like '%' || #{search_input} || '%' 
+		order by emp_no
+	</select>
+	
+	<select id="selectEmployeeSearchDeptName" parameterType="Employee" resultType="Employee">
+		select * from (select COMP_CD, EMP_NO, EMP_ID, EMP_PW, EMP_NM, DEPT_NO, EMP_ROLE_CD, 
+		EMP_PHONE, EMP_EMAIL, EMP_ADDR, INSERT_ID, INSERT_DT, UPDATE_ID, UPDATE_DT, 
+		F_GET_DEPT_NAME(COMP_CD, DEPT_NO) dept_nm, F_GET_CD_NM( COMP_CD, 'ROLE', EMP_ROLE_CD) emp_role_nm, 
+		'N' check_yn from employee_info where comp_cd = #{comp_cd} )
+		where dept_nm like #{search_input} || '%' 
+		order by emp_no
+	</select>
+	
+	<select id="selectEmployeeSearchRoleName" parameterType="Employee" resultType="Employee">
+		select * from (select COMP_CD, EMP_NO, EMP_ID, EMP_PW, EMP_NM, DEPT_NO, EMP_ROLE_CD, 
+		EMP_PHONE, EMP_EMAIL, EMP_ADDR, INSERT_ID, INSERT_DT, UPDATE_ID, UPDATE_DT, 
+		F_GET_DEPT_NAME(COMP_CD, DEPT_NO) dept_nm, F_GET_CD_NM( COMP_CD, 'ROLE', EMP_ROLE_CD) emp_role_nm, 
+		'N' check_yn from employee_info where comp_cd = #{comp_cd} )
+		 where emp_role_nm like #{search_input} || '%' 
+		 order by emp_no
+	</select>
+	
+	<select id="selectEmployeeSearchAll" parameterType="Employee" resultType="Employee">
+		select * from (select COMP_CD, EMP_NO, EMP_ID, EMP_PW, EMP_NM, DEPT_NO, EMP_ROLE_CD, 
+		EMP_PHONE, EMP_EMAIL, EMP_ADDR, INSERT_ID, INSERT_DT, UPDATE_ID, UPDATE_DT, 
+		F_GET_DEPT_NAME(COMP_CD, DEPT_NO) dept_nm, F_GET_CD_NM( COMP_CD, 'ROLE', EMP_ROLE_CD) emp_role_nm, 
+		'N' check_yn from employee_info where comp_cd = #{comp_cd} )
+		where EMP_NM like '%' || #{search_input} || '%' or dept_nm like #{search_input} || '%' or emp_role_nm like #{search_input} || '%' 
+		order by emp_no
+	</select>
+	
+	<select id="selectEmployeeImg" parameterType="Employee" resultType="java.util.Map">
+		select IMG, IMG_FILE_NM, IMG_FILE_RNM from employee_info where comp_cd = #{comp_cd} and emp_no = #{emp_no} 
+	</select>
+	
+	<select id="selectEmployeeImgFileRNM" parameterType="Employee" resultType="String">
+		select IMG_FILE_RNM from employee_info where comp_cd = #{comp_cd} and emp_no = #{emp_no} 
+	</select>
+	
+	<select id="selectEmployeeImgFileRNMCount" parameterType="Employee" resultType="Integer">
+		select Count(*) from employee_info where comp_cd = #{comp_cd} and IMG_FILE_RNM = #{img_file_rnm}
+	</select>
+	
+	<update id="updateEmployeeImg" parameterType="java.util.Map">
+		update employee_info set 
+			IMG = #{img}, IMG_FILE_NM = #{img_file_nm}, IMG_FILE_RNM = #{img_file_rnm}
+		 where comp_cd = #{comp_cd} and emp_no = #{emp_no} 
+	</update>
+	
+	<update id="updateEmployeeImgEmpty" parameterType="Employee">
+		update employee_info set 
+			IMG = NULL, IMG_FILE_NM = NULL, IMG_FILE_RNM = NULL
+		 where comp_cd = #{comp_cd} and emp_no = #{emp_no} 
+	</update>
+	
+</mapper>

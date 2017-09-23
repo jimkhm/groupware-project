@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- http://www.mybatis.org/mybatis-3/ko/configuration.html [매퍼 설정]>[Handling Enums] 에서 복사해 오기 -->
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+    <mapper namespace="spring.mybatis.gw.common.dto.CodeDetailDTO">
+	<resultMap type="CodeDetail" id="codeDetailResultMap">
+		<result column="comp_cd" property="comp_cd"/>
+		<result column="cd_m" property="cd_m"/>
+		<result column="cd_d" property="cd_d"/>
+		<result column="cd_d_nm" property="cd_d_nm"/>
+		<result column="q_ord" property="q_ord"/>
+		<result column="remark" property="remark"/>
+		<result column="insert_id" property="insert_id"/>
+		<result column="insert_dt" property="insert_dt"/>
+		<result column="update_id" property="update_id"/>
+		<result column="update_dt" property="update_dt"/>		
+	</resultMap>
+
+	<select id="selectDetailList" parameterType="String" resultType="CodeDetail">
+		select * from code_detail where comp_cd = #{comp_cd} and cd_m = #{cd_m}
+	</select>
+	<insert id="insertCodeDetail" parameterType="CodeDetail">
+		insert into code_detail values (#{comp_cd}, #{cd_m}, #{cd_d}, #{cd_d_nm}, #{q_ord}, #{remark}, #{insert_id}, SYSDATE, #{update_id}, SYSDATE)
+	</insert>
+	<delete id="deleteCodeDetail" parameterType="String">
+		delete from code_detail where comp_cd = #{comp_cd} and cd_m = #{cd_m} and cd_d = #{cd_d}
+	</delete>
+	<update id="updateCodeDetail" parameterType="hashmap">
+		update code_detail set cd_m = #{detailUpdate.cd_m}, cd_d = #{detailUpdate.cd_d}, cd_d_nm=#{detailUpdate.cd_d_nm}, q_ord=#{detailUpdate.q_ord}, remark = #{detailUpdate.remark}, update_id = #{detailUpdate.update_id}, update_dt = SYSDATE
+		 where comp_cd = #{detailUpdate.comp_cd} and cd_m = #{ocd_m} and cd_d = #{ocd_d}
+	</update>
+	<select id="checkCd_d" parameterType="String" resultType="Integer">
+		select count(cd_d) from code_detail
+		where comp_cd = #{comp_cd} and cd_m = #{cd_m} and cd_d = #{cd_d}
+	</select>
+	<select id="checkQ_ord" parameterType="String" resultType="Integer">
+		select count(q_ord) from code_detail
+		where comp_cd = #{comp_cd} and cd_m = #{cd_m} and q_ord = #{q_ord}
+	</select>
+</mapper>

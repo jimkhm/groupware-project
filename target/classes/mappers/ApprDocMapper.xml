@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- <mappers > -->
+	<mapper namespace="spring.mybatis.gw.apprdoc.dao.ApprListDAO">
+		<resultMap type="Appr" id="apprResultMap">
+			<result column="comp_cd" property="comp_cd"/>
+			<result column="appr_no" property="appr_no"/>
+			<result column="emp_no" property="emp_no"/>
+			<result column="appr_title" property="appr_title"/>
+			<result column="subApprTitle" property="subApprTitle"/>
+			<result column="appr_content" property="appr_content"/>
+			<result column="appr_date_up" property="appr_date_up"/>
+			<result column="appr_date_appr" property="appr_date_appr"/>			
+			<result column="appr_date_final" property="appr_date_final"/>
+			<result column="file_m_id" property="file_m_id"/>
+			<result column="insert_id" property="insert_id"/>		
+			<result column="insert_dt" property="insert_dt"/>
+			<result column="update_id" property="update_id"/>
+			<result column="update_dt" property="update_dt"/>
+			<result column="emp_nm" property="emp_nm"/>	
+			<result column="startrow" property="startrow"/>
+			<result column="endrow" property="endrow"/>		
+		</resultMap> 
+		
+		<resultMap type="spring.mybatis.gw.apprdoc.dto.ApprDetailDTO1" id="ApprDetailDTO1">
+			<result column="comp_cd" property="comp_cd"/>
+			<result column="appr_no" property="appr_no"/>
+			<result column="emp_no" property="emp_no"/>
+			<result column="appr_title" property="appr_title"/>			
+			<result column="appr_content" property="appr_content"/>
+			<result column="appr_date_up" property="appr_date_up"/>
+			<result column="appr_date_appr" property="appr_date_appr"/>			
+			<result column="appr_date_final" property="appr_date_final"/>
+			<result column="file_m_id" property="file_m_id"/>
+			<result column="insert_id" property="insert_id"/>		
+			<result column="insert_dt" property="insert_dt"/>
+			<result column="update_id" property="update_id"/>
+			<result column="update_dt" property="update_dt"/>
+			<result column="dept_no" property="dept_no"/>	
+			<result column="emp_nm" property="emp_nm"/>
+			<result column="comp_nm" property="comp_nm"/>
+			<result column="dept_nm" property="dept_nm"/>			
+		</resultMap>
+	
+		
+		
+		<!-- 결재리스트 개수1 -->
+		<select id="selectApprListCnt1" parameterType="Appr" resultType="int">
+			select count(*) from (select * from appr_doc where comp_cd = #{comp_cd} and emp_no = #{emp_no})
+		</select>
+		
+		<!-- 결재리스트 개수2 -->
+		<select id="selectApprListCnt2" parameterType="Appr" resultType="Integer">
+			select count(*) from (select * from appr_doc where appr_no in (select distinct appr_no from appr_step where COMP_CD= #{comp_cd} and emp_no= #{emp_no} ))
+		</select>
+		
+		<!-- 결재리스트1 -->		
+		<select id="apprDoclist" parameterType="Appr" resultType="Appr">
+			<![CDATA[ 
+			select * from 
+			(select rownum rnum, comp_cd, appr_no, emp_no, appr_title, appr_content, 
+			APPR_DATE_UP, APPR_DATE_APPR, APPR_DATE_FINAL, FILE_M_ID, INSERT_ID, 
+			INSERT_DT, UPDATE_ID, UPDATE_DT, emp_nm from
+			(select comp_cd, appr_no, emp_no, appr_title, appr_content, APPR_DATE_UP, APPR_DATE_APPR, 
+			APPR_DATE_FINAL, FILE_M_ID, INSERT_ID, INSERT_DT, UPDATE_ID, UPDATE_DT, 
+			f_get_emp_name(comp_cd, appr_doc.EMP_NO) emp_nm from appr_doc
+			where comp_cd= #{comp_cd} 
+			and emp_no= #{emp_no} order by UPDATE_DT desc, INSERT_DT desc))
+			where rnum >= #{startrow} 
+			and rnum <= #{endrow}
+			]]> 	
+		</select>
+		 
+		 <!-- 결재리스트2 -->
+		<select id="apprDoclist2" parameterType="Appr" resultType="Appr">
+			<![CDATA[ 
+			select * from
+			(select rownum rnum, comp_cd, appr_no, emp_no, appr_title, appr_content, 
+			APPR_DATE_UP, APPR_DATE_APPR, APPR_DATE_FINAL, FILE_M_ID, INSERT_ID, 
+			INSERT_DT, UPDATE_ID, UPDATE_DT, emp_nm from
+			(select comp_cd, appr_no, emp_no, appr_title, appr_content, APPR_DATE_UP, 
+			APPR_DATE_APPR, APPR_DATE_FINAL, FILE_M_ID, INSERT_ID, INSERT_DT, 
+			UPDATE_ID, UPDATE_DT, f_get_emp_name(comp_cd, appr_doc.EMP_NO) emp_nm 
+			from appr_doc 
+			where appr_no in (select distinct appr_no from appr_step 
+			where COMP_CD= #{comp_cd} 
+			and emp_no= #{emp_no} ) 
+			order by UPDATE_DT desc, INSERT_DT desc) )		
+			where rnum>= #{startrow} 
+			and rnum<= #{endrow}
+			]]>	
+		</select>
+		
+		<!--결재 서류 내용 가져오기  -->
+		<select id="getApprDoc" parameterType="Integer" resultType="ApprDetailDTO1">
+   			select * from (
+					select 
+					d.COMP_CD comp_cd, d.APPR_NO appr_no, d.emp_no emp_no,  d.APPR_TITLE appr_title, d.APPR_CONTENT appr_content,
+					d.APPR_DATE_APPR APPR_DATE_APPR, d.APPR_DATE_FINAL APPR_DATE_FINAL,  d.FILE_M_ID FILE_M_ID, 
+					d.INSERT_ID INSERT_ID, d.INSERT_DT INSERT_DT, d.UPDATE_ID UPDATE_ID, d.UPDATE_DT UPDATE_DT,    
+					e.DEPT_NO DEPT_NO, e.emp_nm emp_nm, c.COMP_NM COMP_NM,
+					F_GET_DEPT_NAME(d.COMP_CD, e.DEPT_NO) dept_nm
+					from APPR_DOC d, EMPLOYEE_INFO e , COMPANY_INFO c 
+					where d.emp_no = e.emp_no and d.comp_cd = e.comp_cd and d.comp_cd = c.comp_cd) 
+					where appr_no = #{param}   		
+   		</select>
+   		
+   		<delete id="deleteApprDoc" parameterType="int">
+			delete from appr_doc where appr_no = #{param1}
+		</delete>
+		
+		<select id="getFileMidExist" parameterType="Integer" resultType="Integer">
+			select FILE_M_ID from appr_doc where appr_no= #{param1}
+		</select>
+		
+		<select id="getApprNo" resultType="Integer">
+			select appr_doc_seq.nextval from dual
+		</select>
+		
+		<insert id="apprDocInsert" parameterType="Appr">
+			insert into appr_doc 
+				(appr_no, comp_cd,  emp_no, appr_title, appr_content, insert_id, 
+				appr_date_appr, appr_date_final, appr_date_up, insert_dt)
+			values
+				(#{appr_no}, #{comp_cd}, #{emp_no}, #{appr_title},
+				#{appr_content, jdbcType=VARCHAR}, #{insert_id, jdbcType=VARCHAR}, #{appr_date_appr, jdbcType=VARCHAR},
+				#{appr_date_final, jdbcType=VARCHAR}, SYSDATE, SYSDATE)
+		</insert>
+		
+		<update id="updateApprDocFileMId" parameterType="Appr">
+			update appr_doc set FILE_M_ID = #{file_m_id} where comp_cd = #{comp_cd}  and appr_no = #{appr_no}
+		</update>
+		
+		<update id="apprDocUpdate" parameterType="spring.mybatis.gw.apprdoc.dto.ApprDocDTO">
+			update appr_doc 
+				set appr_title = #{appr_title}, appr_content = #{appr_content},
+					appr_date_appr =#{appr_date_appr}, appr_date_final= #{appr_date_final},
+					update_dt = sysdate, update_id=#{update_id}	where comp_cd=#{comp_cd} and appr_no=#{appr_no}
+		</update>
+		
+		<update id="setApprFileMIDNull" parameterType="spring.mybatis.gw.apprdoc.dto.ApprDocDTO">
+			update appr_doc set file_m_id = null
+			where comp_cd = #{comp_cd} AND  appr_no=#{appr_no}
+		</update>	
+				
+	</mapper>  
+		
+		
+
+
+
+
+
+
+
+
+ 
+    
+    
+
+    
+    

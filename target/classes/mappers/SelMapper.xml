@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- http://www.mybatis.org/mybatis-3/ko/configuration.html [매퍼 설정]>[Handling Enums] 에서 복사해 오기 -->
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="spring.mybatis.gw.admin.dto.SelDTO">
+	<resultMap type="Sel" id="SelMap">
+		<result column="cd" property="cd" /><!-- 코드 -->
+		<result column="nm" property="nm" /><!-- 코드명 -->
+	</resultMap>
+
+	<select id="selDeptList" parameterType="String" resultMap="SelMap">
+		SELECT DEPT_NO CD, DEPT_NM NM FROM DEPT_INFO WHERE COMP_CD = #{comp_cd} 
+	</select>
+	
+	<select id="selRoleList" parameterType="String" resultMap="SelMap">
+		SELECT  D.CD_D CD,  D.CD_D_NM NM FROM CODE_MASTER M, CODE_DETAIL D 
+		WHERE M.COMP_CD = D.COMP_CD AND M.CD_M = D.CD_M 
+		AND M.COMP_CD = #{comp_cd} AND M.CD_M = 'ROLE'  order by D.Q_ORD 
+	</select>
+	
+	<select id="selCompanyList" resultMap="SelMap">
+		SELECT  COMP_CD AS CD, COMP_NM AS NM FROM Company_INFO ORDER BY COMP_NM 
+	</select>
+	
+</mapper>

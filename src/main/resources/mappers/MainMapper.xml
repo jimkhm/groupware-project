@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- http://www.mybatis.org/mybatis-3/ko/configuration.html [매퍼 설정]>[Handling Enums] 에서 복사해 오기 -->
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="spring.mybatis.gw.main.dto.MainDTO">
+	<resultMap type="Main" id="mainResultMap">
+		<result column="comp_cd" property="comp_cd"/>
+		<result column="emp_no" property="emp_no"/>
+		<result column="emp_id" property="emp_id"/>
+		<result column="emp_pw" property="emp_pw"/>
+		<result column="emp_nm" property="emp_nm"/>
+		<result column="emp_role_cd" property="emp_role_cd"/>
+		<result column="emp_phone" property="emp_phone"/>
+		<result column="emp_email" property="emp_email"/>
+		<result column="emp_addr" property="emp_addr"/>
+		<result column="insert_id" property="insert_id"/>
+		<result column="insert_dt" property="insert_dt"/>
+		<result column="update_id" property="update_id"/>
+		<result column="update_dt" property="update_dt"/>
+	</resultMap>
+	
+	<select id="selectEmpChk" parameterType="Main"  resultType="String" >
+		select emp_pw from employee_info
+		where comp_cd=#{comp_cd} and emp_id=#{emp_id}
+	</select>
+	
+	<select id="selectEmpPwChk" parameterType="Main" resultType="Main">
+		select * from employee_info 
+		where comp_cd=#{comp_cd} and emp_id=#{emp_id}
+	</select>
+
+	 <update id="updateEmployeeWithPw" parameterType="Main" >
+		update employee_info set
+			emp_pw = #{emp_pw},
+			update_id = #{update_id, jdbcType=VARCHAR},
+			update_dt = SYSDATE
+		where comp_cd = #{comp_cd} and emp_id = #{emp_id}
+	</update>
+	
+	<update id="updateEmployee" parameterType="Main" >
+		update employee_info set
+			update_id = #{update_id, jdbcType=VARCHAR},
+			update_dt = SYSDATE
+		where comp_cd = #{comp_cd} and emp_id = #{emp_id}
+	</update>
+	
+	<update id="updateInfoChange" parameterType="Main">
+		update employee_info set 
+			emp_phone = #{emp_phone, jdbcType=VARCHAR}, 
+			emp_email = #{emp_email, jdbcType=VARCHAR}, 
+			emp_addr = #{emp_addr, jdbcType=VARCHAR}
+		where comp_cd = #{comp_cd} and emp_id = #{emp_id}
+	</update>
+
+</mapper>

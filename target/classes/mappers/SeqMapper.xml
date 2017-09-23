@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- http://www.mybatis.org/mybatis-3/ko/configuration.html [매퍼 설정]>[Handling Enums] 에서 복사해 오기 -->
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="spring.mybatis.gw.admin.dto.SeqDTO">
+	<parameterMap type="HashMap" id="SeqMap">
+		<parameter property="sq_cd" mode="IN" javaType="String" jdbcType="VARCHAR" />
+		<parameter property="sq_nm" mode="IN" javaType="String" jdbcType="VARCHAR" />
+		<parameter property="ret" mode="INOUT" javaType="Integer" jdbcType="INTEGER" />
+		<parameter property="dbcode" mode="INOUT" javaType="Integer" jdbcType="INTEGER"/>
+		<parameter property="dberrtext" mode="INOUT" javaType="String" jdbcType="VARCHAR"/>
+	</parameterMap>
+	
+	<select id="selectSeqNo" statementType="CALLABLE" parameterMap="SeqMap">
+		{ call P_SET_SEQ_NO ( ?, ?, ?, ?, ? ) }
+	</select>
+	
+</mapper>

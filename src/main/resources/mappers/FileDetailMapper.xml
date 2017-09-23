@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- http://www.mybatis.org/mybatis-3/ko/configuration.html [매퍼 설정]>[Handling Enums] 에서 복사해 오기 -->
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="spring.mybatis.gw.share.dto.FileDetailDTO">
+	<resultMap type="FileDetail" id="FileDetailResultMap">
+		<result column="comp_cd" property="comp_cd"/>
+		<result column="file_m_id" property="file_m_id"/>
+		<result column="file_d_id" property="file_d_id"/>
+		<result column="file_path" property="file_path"/>
+		<result column="file_nm" property="file_nm"/>
+		<result column="file_rnm" property="file_rnm"/>
+		<result column="file_size" property="file_size"/>
+		<result column="file_type" property="file_type"/>
+		<result column="insert_id" property="insert_id"/>
+		<result column="insert_dt" property="insert_dt"/>
+	</resultMap>
+	
+	<select id="getFileDetailId" resultType="Integer">
+		select FILE_DETAIL_SEQ.nextval from dual
+	</select>
+	
+	<insert id="insertFileDetail" parameterType="FileDetail">
+			insert into file_detail (COMP_CD, FILE_M_ID, FILE_D_ID, FILE_PATH, FILE_NM, FILE_RNM, file_size, file_type, INSERT_ID, INSERT_DT) 
+			values( #{comp_cd}, #{file_m_id}, #{file_d_id}, 
+			#{file_path, jdbcType=VARCHAR}, #{file_nm, jdbcType=VARCHAR}, #{file_rnm, jdbcType=VARCHAR}, 
+			#{file_size, jdbcType=VARCHAR}, #{file_type, jdbcType=VARCHAR}, 
+			#{insert_id, jdbcType=VARCHAR}, sysdate )
+	</insert>
+	
+	<delete id="deleteFileDetail" parameterType="FileDetail">
+		delete from FILE_DETAIL where comp_cd = #{comp_cd} and FILE_M_ID = #{file_m_id}		
+	</delete>
+	
+	<delete id="deleteSomeFileDetail" parameterType="FileDetail" >
+		delete from FILE_DETAIL where comp_cd = #{comp_cd} and FILE_M_ID = #{file_m_id} and FILE_D_ID = #{file_d_id}
+	</delete>
+
+	<select id="selectAllDetailFile" parameterType="FileDetail" resultType="FileDetail">
+		select * from FILE_DETAIL where comp_cd = #{comp_cd} and FILE_M_ID = #{file_m_id}
+	</select>
+	
+	<select id="selectDetailFile" parameterType="FileDetail" resultType="FileDetail">
+		select * from FILE_DETAIL where comp_cd = #{comp_cd} and FILE_M_ID = #{file_m_id} and FILE_D_ID = #{file_d_id}
+	</select>
+	
+	<!-- 카운트해서 0이면...  -->
+	<select id="selectCountFileDetail" parameterType="FileDetail" resultType="Integer">
+		select count(*) from FILE_DETAIL where comp_cd = #{comp_cd} and FILE_M_ID = #{file_m_id}
+	</select>
+	
+	<select id="selectSameFileCnt" parameterType="String" resultType="Integer">
+		select count(*) as count from FILE_DETAIL where file_nm = #{file_nm}
+	</select>
+	
+</mapper>

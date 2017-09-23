@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- http://www.mybatis.org/mybatis-3/ko/configuration.html [매퍼 설정]>[Handling Enums] 에서 복사해 오기 -->
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+    <mapper namespace="spring.mybatis.gw.common.dto.CodeMasterDTO">
+	<resultMap type="CodeMaster" id="codeMasterResultMap">
+		<result column="comp_cd" property="comp_cd"/>
+		<result column="cd_m" property="cd_m"/>
+		<result column="cd_nm" property="cd_nm"/>
+		<result column="remark" property="remark"/>
+		<result column="insert_id" property="insert_id"/>
+		<result column="insert_dt" property="insert_dt"/>
+		<result column="update_id" property="update_id"/>
+		<result column="update_dt" property="update_dt"/>		
+	</resultMap>
+
+	<select id="selectMasterList" parameterType="String" resultType="CodeMaster">
+		select * from code_master where comp_cd = #{comp_cd}
+	</select>
+	<insert id="insertCodeMaster" parameterType="CodeMaster">
+		insert into code_master values (#{comp_cd}, #{cd_m}, #{cd_nm}, #{remark}, #{insert_id}, SYSDATE, #{update_id}, SYSDATE)
+	</insert>
+	<delete id="deleteCodeMaster" parameterType="hashmap">
+		delete from code_master where comp_cd = #{comp_cd} and cd_m = #{cd_m}
+	</delete>
+	<delete id="deleteCodeMD" parameterType="hashmap">
+		delete from code_detail where comp_cd = #{comp_cd} and cd_m = #{cd_m}
+	</delete>
+	<update id="updateCodeMaster" parameterType="hashmap">
+		update code_master set cd_m = #{masterUpdate.cd_m}, cd_nm = #{masterUpdate.cd_nm}, remark = #{masterUpdate.remark}, update_id = #{masterUpdate.update_id}, update_dt = SYSDATE 
+		where comp_cd = #{masterUpdate.comp_cd} and cd_m = #{ocd_m}
+	</update>
+	<update id="updateCodeMD" parameterType="hashmap">
+		update code_detail set cd_m = #{masterUpdate.cd_m}, update_id = #{masterUpdate.update_id}, update_dt = SYSDATE 
+		where comp_cd = #{masterUpdate.comp_cd} and cd_m = #{ocd_m}
+	</update>
+	<select id="checkCd_m" parameterType="String" resultType="Integer">
+		select count(cd_m) from code_master
+		where comp_cd = #{comp_cd} and cd_m = #{cd_m}
+	</select>
+</mapper>

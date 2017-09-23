@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- http://www.mybatis.org/mybatis-3/ko/configuration.html [매퍼 설정]>[Handling Enums] 에서 복사해 오기 -->
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="spring.mybatis.gw.board.dto.BoardDTO">
+	<resultMap type="Board" id="BoardResultMap">
+	
+		<result column="NO" property="NO"/>
+		<result column="M_YN" property="M_YN"/>
+		<result column="SUBJECT" property="SUBJECT"/>
+		<result column="GUBUN" property="GUBUN"/>
+		<result column="CONTENT" property="CONTENT"/>
+		<result column="READCOUNT" property="READCOUNT"/>
+		<result column="FILE_M_ID" property="FILE_M_ID"/>
+		<result column="SUB_SUBJECT" property="SUB_SUBJECT"/>
+		<result column="EMP_NO" property="EMP_NO"/>
+		<result column="EMP_PW" property="EMP_PW"/>
+		<result column="EMP_NM" property="EMP_NM"/>
+		<result column="DEPT_NO" property="DEPT_NO"/>
+		<result column="EMP_ROLE_CD" property="EMP_ROLE_CD"/>
+		<result column="EMP_PHONE" property="EMP_PHONE"/>
+		<result column="EMP_EMAIL" property="EMP_EMAIL"/>
+		<result column="EMP_ADDR" property="EMP_ADDR"/>
+		<result column="INSERT_ID" property="INSERT_ID"/>
+		<result column="UPDATE_ID" property="UPDATE_ID"/>
+		<result column="COMP_CD" property="COMP_CD"/>
+		<result column="INSERT_DT" property="INSERT_DT"/>
+		<result column="UPDATE_DT" property="UPDATE_DT"/>
+		<result column="startrow" property="startrow"/>
+		<result column="endrow" property="endrow"/>
+		
+		
+		
+	</resultMap>
+	
+	<!-- 글 개수  -->
+	<select id="selectBoardListCount" parameterType="Board" resultType="Integer">
+		select count(*) from ( select comp_cd, no, m_yn, emp_no, subject, GUBUN, INSERT_DT, content, READCOUNT, 
+					 '관리자' emp_nm  from GW_BOARD where COMP_CD = #{COMP_CD} and GUBUN = '0' 
+					 union all 
+					 select b.COMP_CD COMP_CD, b.NO NO, b.M_YN M_YN, b.EMP_NO EMP_NO, b.SUBJECT SUBJECT, 
+					 b.GUBUN GUBUN, b.INSERT_DT INSERT_DT, b.CONTENT CONTENT, b.READCOUNT READCOUNT, 
+					 emp.EMP_NM EMP_NM  from GW_BOARD b, employee_info emp 
+					 where b.COMP_CD = emp.COMP_CD and b.EMP_NO = emp.EMP_NO 
+					 and b.COMP_CD = #{COMP_CD} and b.GUBUN not in ('0') and emp.DEPT_NO = #{DEPT_NO}
+					  )	
+	</select>
+	
+	<!--글 목록 리스트  -->
+	<select id="selectBoardList" parameterType="Board" resultType="Board">
+		      select * from (
+		      select rownum rn, a.* from (	
+		      select * from (select comp_cd, no, m_yn, emp_no, subject, gubun, INSERT_DT, content, readcount, 
+							 '관리자' emp_nm  from GW_BOARD where COMP_CD = #{COMP_CD} and GUBUN = '0' 
+							 order by INSERT_DT desc ) 
+		       					union all
+		      select * from (select b.COMP_CD COMP_CD, b.NO NO, b.M_YN M_YN, b.EMP_NO EMP_NO, b.SUBJECT SUBJECT, 
+							 b.GUBUN GUBUN, b.INSERT_DT INSERT_DT, b.CONTENT CONTENT, b.READCOUNT READCOUNT, 
+							 emp.EMP_NM EMP_NM  from GW_BOARD b, employee_info emp 
+							 where b.COMP_CD = emp.COMP_CD and b.EMP_NO = emp.EMP_NO 
+							 and b.COMP_CD = #{COMP_CD} and emp.DEPT_NO = #{DEPT_NO} and b.GUBUN not in ('0') 
+							 order by INSERT_DT desc ) ) a )
+		           			where rn between #{startrow} and #{endrow} 
+	</select>
+								<!-- where rn between #{startrow} and #{endrow}  -->
+								<!-- select * from (select comp_cd, no, m_yn, emp_no, subject, GUBUN, INSERT_DT, content, READCOUNT, 
+					 			 '관리자' emp_nm  from GW_BOARD 
+					 			 where COMP_CD = #{COMP_CD} and GUBUN = '0' order by INSERT_DT desc )  
+								 union all 
+								select * from (select b.COMP_CD COMP_CD, b.NO NO, b.M_YN M_YN, b.EMP_NO EMP_NO, b.SUBJECT SUBJECT, 
+					 			 b.GUBUN GUBUN, b.INSERT_DT INSERT_DT, b.CONTENT CONTENT, b.READCOUNT READCOUNT, 
+					             emp.EMP_NM EMP_NM  
+					 			 from GW_BOARD b, employee_info emp 
+								 where b.COMP_CD = emp.COMP_CD and b.EMP_NO = emp.EMP_NO 
+					 			and b.COMP_CD = #{COMP_CD} and emp.DEPT_NO = #{DEPT_NO} and b.GUBUN not in ('0') 
+					 			order by INSERT_DT desc )  -->
+	
+	<!--글 내용(상세 보기)  -->
+	<select id="getDetail" parameterType="Board" resultType="Board">
+		select * from GW_BOARD where COMP_CD = #{COMP_CD} AND NO = #{NO}
+	</select>
+	
+	<!-- 상세보기 가져오는 파일 메서드  -->
+	<!-- 파일 Mapper에 있음.  -->
+		
+	
+	<!-- board_no(글 번호) 받아오기 -->
+	<select id="getBoardNo" resultType="Integer">
+		select GW_BOARD_seq.nextval from dual	
+	</select>
+	
+	<!--GW_BOARD 테이블 저장 (글 등록)  --> <!--insert는 not null이 아닌 것들에 자료형을 지정해줘야한다. -->
+	<insert id="gwBoardInsert" parameterType="Board" >
+	     insert into
+			  		GW_BOARD (COMP_CD, NO, M_YN, EMP_NO, SUBJECT, GUBUN, CONTENT, READCOUNT, INSERT_DT) 
+			  values 
+			  		(#{COMP_CD}, #{NO}, #{M_YN}, #{EMP_NO, jdbcType=VARCHAR}, #{SUBJECT}, #{GUBUN}, #{CONTENT, jdbcType=VARCHAR}, 0,  SYSDATE) 
+	</insert>
+	
+	<!--글 수정에서 FILE_M_ID를 null로 업데이트해주는 목적  -->
+	<update id="updateBoardFileMId" parameterType="Board">
+		update gw_board set FILE_M_ID = #{FILE_M_ID, jdbcType=INTEGER}
+		where Comp_cd = #{COMP_CD} and no = #{NO}
+	</update>
+	
+	 <!--글 수정  -->
+	<update id="boardModify" parameterType="Board">
+		update GW_BOARD set 
+		SUBJECT=#{SUBJECT, jdbcType=VARCHAR}, 
+		CONTENT=#{CONTENT, jdbcType=VARCHAR} where COMP_CD = #{COMP_CD} AND NO=#{NO}
+	</update>
+	
+	<!--글 삭제  -->
+	<delete id="boardDelete" parameterType="Board">
+		delete from GW_BOARD where COMP_CD = #{COMP_CD} AND  NO=#{NO}
+	</delete>
+	
+	<!-- 조회수 업데이트  -->  
+	<update id="setReadCountUpdate" parameterType="Board">
+		update GW_BOARD set READCOUNT = READCOUNT+1 
+		where COMP_CD = #{COMP_CD} AND  NO=#{NO}
+	</update>
+
+	<update id="setBoardFileMIDNull" parameterType="Board">
+		update GW_BOARD set FILE_M_ID = null
+		where COMP_CD = #{COMP_CD} AND  NO=#{NO}
+	</update>	
+	
+</mapper>

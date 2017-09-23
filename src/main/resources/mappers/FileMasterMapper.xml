@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- http://www.mybatis.org/mybatis-3/ko/configuration.html [매퍼 설정]>[Handling Enums] 에서 복사해 오기 -->
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="spring.mybatis.gw.share.dto.FileMasterDTO">
+	<resultMap type="FileMaster" id="FileMasterResultMap">
+		<result column="comp_cd" property="comp_cd"/>
+		<result column="file_m_id" property="file_m_id"/>
+		<result column="file_gubun" property="file_gubun"/>
+		<result column="insert_id" property="insert_id"/>
+		<result column="insert_dt" property="insert_dt"/>
+	</resultMap>
+	
+	<select id="getFileMasterId" resultType="Integer">
+		select FILE_MASTER_SEQ.nextval from dual
+	</select>
+	
+	<insert id="insertFileMaster" parameterType="FileMaster">
+			insert into file_master (COMP_CD, FILE_M_ID, FILE_GUBUN,  INSERT_ID, INSERT_DT) 
+			values (#{comp_cd}, #{file_m_id}, #{file_gubun, jdbcType=VARCHAR} , #{insert_id, jdbcType=VARCHAR},  sysdate )
+	</insert>
+	
+	<delete id="deleteFileMaster" parameterType="FileMaster">
+		delete from FILE_MASTER where comp_cd = #{comp_cd} and file_m_id = #{file_m_id} 
+	</delete>
+
+	<select id="selectFileMaster" resultType="FileMaster">
+		select * from FILE_MASTER where comp_cd = #{comp_cd} and file_m_id = #{file_m_id} 
+	</select>
+	
+</mapper>

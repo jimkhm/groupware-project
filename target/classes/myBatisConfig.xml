@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 1) http://www.mybatis.org/mybatis-3/ko/getting-started.html [XML에서 SqlSessionFactory 빌드하기] 에서 복사해 오기 -->
+<!DOCTYPE configuration
+  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	
+	<!-- <properties resource="dbinfo/dbconnect.properties" />2) dbconnect.properties 추가 --><!-- db 설정 부분은 root-context.xml 로 넘어감 -->
+	
+	<!-- 3) http://www.mybatis.org/mybatis-3/ko/configuration.html#typeAliases [typeAliases] 에서 복사해 오기 -->
+	<typeAliases>
+		<typeAlias alias="User" type="spring.mybatis.model.UserBean"/>
+		<typeAlias alias="Company" type="spring.mybatis.gw.admin.dto.CompanyDTO"/>
+		<typeAlias alias="Dept" type="spring.mybatis.gw.admin.dto.DeptDTO"/>
+		<typeAlias alias="Employee" type="spring.mybatis.gw.admin.dto.EmployeeDTO"/>
+		<typeAlias alias="Seq" type="spring.mybatis.gw.admin.dto.SeqDTO"/>
+		<typeAlias alias="Sel" type="spring.mybatis.gw.admin.dto.SelDTO"/>
+		<typeAlias alias="SelDept" type="spring.mybatis.gw.admin.dto.SelDeptDTO"/>
+		<typeAlias alias="SelRole" type="spring.mybatis.gw.admin.dto.SelRoleDTO"/>
+		<typeAlias alias="Main" type="spring.mybatis.gw.main.dto.MainDTO"/>
+		<typeAlias alias="CodeDetail" type="spring.mybatis.gw.common.dto.CodeDetailDTO"/>
+		<typeAlias alias="CodeMaster" type="spring.mybatis.gw.common.dto.CodeMasterDTO"/>
+		<typeAlias alias="Board" type="spring.mybatis.gw.board.dto.BoardDTO" />
+		<typeAlias alias="FileMaster" type="spring.mybatis.gw.share.dto.FileMasterDTO" />
+		<typeAlias alias="FileDetail" type="spring.mybatis.gw.share.dto.FileDetailDTO" />
+		<typeAlias alias="Appr" type="spring.mybatis.gw.apprdoc.dto.ApprListDTO"/>	
+		<typeAlias alias="ApprDetailDTO1" type="spring.mybatis.gw.apprdoc.dto.ApprDetailDTO1"/>
+		<typeAlias alias="ApprDetailDTO2" type="spring.mybatis.gw.apprdoc.dto.ApprDetailDTO2"/>
+		<typeAlias alias="HistoryPopDTO" type="spring.mybatis.gw.apprdoc.dto.HistoryPopDTO"/>
+		<typeAlias alias="ApprHistoryDTO" type="spring.mybatis.gw.apprdoc.dto.ApprHistoryDTO"/>		
+		<typeAlias alias="ApprDocDTO" type="spring.mybatis.gw.apprdoc.dto.ApprDocDTO"/>
+		<typeAlias alias="ApprStepDTO" type="spring.mybatis.gw.apprdoc.dto.ApprStepDTO"/>
+		
+	</typeAliases>
+	
+	<!-- db 설정 부분은 root-context.xml 로 넘어감 -->
+<!--   <environments default="development">
+    <environment id="development">
+      <transactionManager type="JDBC"/>
+      <dataSource type="POOLED">
+        <property name="driver" value="${driver}"/>
+        <property name="url" value="${url}"/>
+        <property name="username" value="${username}"/>
+        <property name="password" value="${password}"/>
+      </dataSource>
+    </environment>
+  </environments> -->
+  <mappers>
+    <!-- <mapper resource="org/mybatis/example/BlogMapper.xml"/> -->
+    <mapper resource="mappers/UserMapper.xml" /><!-- 3) UserMapper.xml 추가 -->
+    <mapper resource="mappers/SelMapper.xml" />
+    <mapper resource="mappers/CompanyMapper.xml" />
+    <mapper resource="mappers/DeptMapper.xml" />
+    <mapper resource="mappers/EmployeeMapper.xml" />
+    <mapper resource="mappers/SeqMapper.xml" />    
+    
+    <mapper resource="mappers/MainMapper.xml" />
+    
+    <mapper resource="mappers/CodeDetailMapper.xml" />    
+    <mapper resource="mappers/CodeMasterMapper.xml" />
+    
+    <mapper resource="mappers/BoardMapper.xml" />
+    
+    <mapper resource="mappers/FileMasterMapper.xml" />
+    <mapper resource="mappers/FileDetailMapper.xml" />
+    <mapper resource="mappers/ApprDocMapper.xml"/>
+    <mapper resource="mappers/ApprStatusMapper.xml"/>  		
+  	<mapper resource="mappers/ApprStepMapper.xml"/>
+    
+    
+  </mappers>
+</configuration>
+
+
+
+
+
+

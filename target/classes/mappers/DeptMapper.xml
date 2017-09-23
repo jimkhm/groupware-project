@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- http://www.mybatis.org/mybatis-3/ko/configuration.html [매퍼 설정]>[Handling Enums] 에서 복사해 오기 -->
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">	
+<mapper namespace="spring.mybatis.gw.admin.dto.DeptDTO">
+	<resultMap type="Dept" id="deptResultMap">
+		<result column="comp_cd" property="comp_cd"/><!-- 회사 코드 -->
+		<result column="dept_no" property="dept_no"/><!-- 부서 코드 -->
+		<result column="dept_nm" property="dept_nm"/><!-- 부서명 -->
+		<result column="dept_manager" property="dept_manager"/><!-- 부서장(사번) -->
+		<result column="dept_manager_nm" property="dept_manager_nm"/><!-- 부서장(이름) -->
+		<result column="m_dept_no" property="m_dept_no"/><!-- 상위 부서 코드 -->
+		<result column="insert_id" property="insert_id"/><!-- insert user -->
+		<result column="insert_dt" property="insert_dt"/><!-- insert time -->
+		<result column="update_id" property="update_id"/><!-- 최종 update user -->
+		<result column="update_dt" property="update_dt"/><!-- 최종 update time -->
+	</resultMap>
+
+	<insert id="insertDept" parameterType="Dept">
+		insert into Dept_info ( 
+			COMP_CD, DEPT_NO, DEPT_NM,
+			DEPT_MANAGER, M_DEPT_NO,
+			INSERT_ID, INSERT_DT, UPDATE_ID, UPDATE_DT )
+		values ( #{comp_cd}, #{dept_no}, #{dept_nm}, 
+			#{dept_manager, jdbcType=VARCHAR}, #{m_dept_no, jdbcType=VARCHAR}, 
+			#{insert_id, jdbcType=VARCHAR}, SYSDATE, null, null)
+	</insert>
+	
+	<update id="updateDeptTree" parameterType="Dept">
+		update Dept_info set 
+			dept_nm = #{dept_nm}, 
+			dept_manager = #{dept_manager, jdbcType=VARCHAR}, m_dept_no = #{m_dept_no, jdbcType=VARCHAR}, 
+			update_id = #{update_id, jdbcType=VARCHAR}, update_dt = SYSDATE 
+		where comp_cd = #{comp_cd} and dept_no = #{dept_no} 
+	</update>
+	
+	<update id="updateDept" parameterType="Dept">
+		update Dept_info set 
+			dept_nm = #{dept_nm}, 
+			dept_manager = #{dept_manager, jdbcType=VARCHAR},  
+			update_id = #{update_id, jdbcType=VARCHAR}, update_dt = SYSDATE 
+		where comp_cd = #{comp_cd} and dept_no = #{dept_no} 
+	</update>
+	
+	<delete id="deleteSubDept" parameterType="Dept">
+		delete from Dept_info where comp_cd = #{comp_cd} and m_dept_no = #{m_dept_no}
+	</delete>
+	
+	<delete id="deleteDept" parameterType="Dept">
+		delete from Dept_info where comp_cd = #{comp_cd} and dept_no = #{dept_no}
+	</delete>
+	
+	<select id="selectCountDept" parameterType="Dept" resultType="Integer">
+		select count(*) from Dept_info where comp_cd = #{comp_cd} and dept_no = #{dept_no}		
+	</select>
+	<!--
+		select comp_cd, dept_no, dept_nm, dept_manager, 
+		F_GET_EMP_NAME(comp_cd, dept_manager) dept_manager_nm, m_dept_no, 
+		insert_id, insert_dt, update_id, update_dt 
+		from Dept_info where comp_cd = #{comp_cd} order by dept_no 
+	  -->
+	<select id="selectAllDept" parameterType="String" resultType="Dept">
+		select comp_cd, dept_no, dept_nm, dept_manager, 
+		F_GET_EMP_NAME(comp_cd, dept_manager) dept_manager_nm, m_dept_no, 
+		insert_id, insert_dt, update_id, update_dt 
+		from Dept_info where comp_cd = #{comp_cd} order by dept_no 
+	</select>
+	
+</mapper>

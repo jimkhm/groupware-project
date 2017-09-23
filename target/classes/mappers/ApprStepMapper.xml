@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- <mappers > -->
+	<mapper namespace="spring.mybatis.gw.apprdoc.dto.ApprDetailDTO2">
+		
+		
+		<!--내 결재 순서 가지고 오기  -->
+		<select id="getApprMe" parameterType="spring.mybatis.gw.apprdoc.dto.ApprListDTO"
+			resultType="Integer">
+			select rnum from
+			( select rownum rnum, appr_line, APPR_priority, emp_no, APPR_NO from
+			(select appr_line, APPR_priority, emp_no, APPR_NO
+			from appr_step
+			where appr_no= #{appr_no} and APPR_LINE = 'A'
+			or appr_no = #{appr_no} and APPR_LINE = 'B'
+			order by appr_line desc, appr_priority asc))where emp_no = #{emp_no}
+		</select>
+		
+		<!--결재 최고 순위 가져오기  -->
+		<select id="getApprMax" parameterType="int" resultType="Integer">
+			select max(rnum) from
+			( select rownum rnum, appr_line, APPR_priority, emp_no, APPR_NO from
+			(select appr_line, APPR_priority, emp_no, APPR_NO from appr_step
+			where appr_no= #{param1} and APPR_LINE = 'A' or appr_no = #{param1}
+			and APPR_LINE = 'B' order by appr_line desc, appr_priority asc))
+		</select>
+		
+		<!--내 결재 라인 가져오기  -->	
+		<select id="getApprMyLine" parameterType="spring.mybatis.gw.apprdoc.dto.ApprListDTO"
+			resultType="String">
+			select appr_line from
+			(select appr_line, APPR_priority, emp_no, APPR_NO from appr_step where
+			appr_no=#{appr_no})
+			where emp_no = #{emp_no}
+			order by appr_line desc
+		</select>	
+		
+		<!--결재자 리스트 가져오기   -->
+		<select id="getApprStep" parameterType="Integer" resultType="spring.mybatis.gw.apprdoc.dto.ApprDetailDTO2">
+   			select * from
+   				(select t.APPR_LINE_NO APPR_LINE_NO, t.APPR_NO APPR_NO,  t.APPR_LINE APPR_LINE, 
+				t.emp_no emp_no, t.APPR_priority APPR_priority, e.EMP_NM EMP_NM 
+				from APPR_STEP t, EMPLOYEE_INFO e where t.EMP_NO = e.EMP_NO and t.COMP_CD = e.COMP_CD) 
+				where appr_no =  #{param1} order by appr_priority
+   		</select>
+   		
+   		<!--결재자 삭제  -->
+   		<delete id="deleteApprStep" parameterType="int">
+			delete from appr_step where appr_no = #{param1}
+		</delete>
+		
+		<insert id="apprStepInsert" parameterType="spring.mybatis.gw.apprdoc.dto.ApprStepDTO">
+			insert into APPR_STEP 
+				(APPR_LINE_NO, COMP_CD, APPR_NO, APPR_LINE,
+				 EMP_NO, APPR_priority,insert_id, INSERT_DT)
+			values
+				(APPR_STEP_SEQ.nextval, #{comp_cd}, #{appr_no}, #{appr_line}, 
+				#{emp_no, jdbcType=VARCHAR},#{appr_priority, jdbcType=INTEGER}, #{insert_id, jdbcType=VARCHAR}, sysdate)		
+		</insert>
+		
+		<!--결재라인 중복이 있을 경우를 대비해서 A나 B일 경우만 appr_line_no을 받아오도록 했다  -->
+		<!-- 결재자와 합의자는 결재 라인 지정시 겹치지 않도록 제약을 걸어 두었다 -->
+		<select id="getApprLineNo" parameterType="spring.mybatis.gw.apprdoc.dto.ApprListDTO" resultType="Integer">
+			select appr_line_no from appr_step where appr_no =#{appr_no} and emp_no = #{emp_no} and (appr_line = 'A' or appr_line= 'B')
+	</select>
+	
+	</mapper>
+	
+
+

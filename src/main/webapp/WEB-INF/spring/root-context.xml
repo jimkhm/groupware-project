@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:jee="http://www.springframework.org/schema/jee"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-3.1.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+	
+	<context:annotation-config /><!-- annotation 사용하기 위한 설정 -->
+	
+	<!-- Root Context: defines shared resources visible to all other web components -->
+
+	<!-- DataSource(Connection Pool) 빈 등록 - JNDI[Java Naming and Directory Interface] 환경 설정 -->
+	<jee:jndi-lookup jndi-name="jdbc/OracleDB" resource-ref="true" id="dataSource"/>
+	<!-- 탐캣 > server.xml Context > Resource 설정해줌 -->
+
+  	<!-- myBatis 관련 환경 설정 (시작) -->
+  	<!-- org.apache.ibatis.session.SqlSessionFactory 빈을 생성 -->
+  	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+  		<property name="dataSource" ref="dataSource" />
+  		<property name="configLocation" value="classpath:/myBatisConfig.xml" />
+  		<!-- <property name="mapperLocations" value="classpath:mappers/**/*Mapper.xml" /> -->
+  	</bean>
+  	<!-- org.apache.ibatis.session.SqlSession 빈을 생성 -->
+  	<bean id="sqlSession" class="org.mybatis.spring.SqlSessionTemplate">
+  		<constructor-arg index="0" ref="sqlSessionFactory" />
+  	</bean>
+  	<!-- myBatis 관련 환경 설정 (끝) -->
+	
+	<bean id="securityUtil" class="spring.mybatis.gw.security.util.SecurityUtil" />
+		
+	<bean id="userDAO" class="spring.mybatis.dao.UserDAOImpl" p:sqlSession-ref="sqlSession" />
+  	<bean id="companyDAO" class="spring.mybatis.gw.admin.dao.CompanyDAO" p:sqlSession-ref="sqlSession" />
+  	<bean id="deptDAO" class="spring.mybatis.gw.admin.dao.DeptDAO" p:sqlSession-ref="sqlSession" />
+  	<bean id="employeeDAO" class="spring.mybatis.gw.admin.dao.EmployeeDAO" p:sqlSession-ref="sqlSession" />
+  	<bean id="mainDAO" class="spring.mybatis.gw.main.dao.MainDAO" p:sqlSession-ref="sqlSession" />
+  	<bean id="codeDetailDAO" class="spring.mybatis.gw.common.dao.CodeDetailDAO" p:sqlSession-ref="sqlSession" />
+  	<bean id="codeMasterDAO" class="spring.mybatis.gw.common.dao.CodeMasterDAO" p:sqlSession-ref="sqlSession" />
+  	<bean id="boardDAO" class="spring.mybatis.gw.board.dao.BoardDAO" p:sqlSession-ref="sqlSession" />  	
+  	<bean id="fileMasterDAO" class="spring.mybatis.gw.share.dao.FileMasterDAO" p:sqlSession-ref="sqlSession" />
+  	<bean id="fileDetailDAO" class="spring.mybatis.gw.share.dao.FileDetailDAO" p:sqlSession-ref="sqlSession" />
+  	<bean id="apprListDAO" class="spring.mybatis.gw.apprdoc.dao.ApprListDAO" p:sqlSession-ref="sqlSession"/>
+  	<bean id="apprStatusDAO" class="spring.mybatis.gw.apprdoc.dao.ApprStatusDAO" p:sqlSession-ref="sqlSession"/> 
+  	<bean id="apprDetailDAO" class="spring.mybatis.gw.apprdoc.dao.ApprDetailDAO" p:sqlSession-ref="sqlSession" />  	
+  	<bean id="apprAddDAO" class="spring.mybatis.gw.apprdoc.dao.ApprAddDAO" p:sqlSession-ref="sqlSession"/>
+  	<bean id="apprDeleteDAO" class="spring.mybatis.gw.apprdoc.dao.ApprDeleteDAO" p:sqlSession-ref="sqlSession"/>
+  	<bean id="apprUpdateDAO" class="spring.mybatis.gw.apprdoc.dao.ApprUpdateDAO" p:sqlSession-ref="sqlSession"/>
+  	
+</beans>
+
+
+
+
+
